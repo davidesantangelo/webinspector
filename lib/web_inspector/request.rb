@@ -1,7 +1,7 @@
 require 'addressable/uri'
 
 module WebInspector
-  class Uri
+  class Request
   	def initialize(url)
   		@url = url
   	end

@@ -5,7 +5,7 @@ require 'open_uri_redirections'
 require 'faraday'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
-require File.expand_path(File.join(File.dirname(__FILE__), 'uri'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
 
 module WebInspector
   class Page
@@ -14,7 +14,7 @@ module WebInspector
     def initialize(url, options = {})
       @url = url
       @options = options
-      @uri = WebInspector::Uri.new(url)
+      @request = WebInspector::Request.new(url)
       @inspector = WebInspector::Inspector.new(page)
     end
 
@@ -39,19 +39,19 @@ module WebInspector
     end
 
     def url
-      @uri.url
+      @request.url
     end
 
     def host
-      @uri.host
+      @request.host
     end
 
     def scheme
-      @uri.scheme
+      @request.scheme
     end
 
     def port
-      @uri.port
+      @request.port
     end
 
     def to_hash
@@ -107,7 +107,7 @@ module WebInspector
     end
 
     def page
-      Nokogiri::HTML(open(@uri.url, :allow_redirections => :safe))
+      Nokogiri::HTML(open(@request.url, :allow_redirections => :safe))
     end
   end
 end
