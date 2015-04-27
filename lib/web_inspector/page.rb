@@ -3,6 +3,7 @@ require 'uri'
 require 'addressable/uri'
 require 'open-uri'
 require 'open_uri_redirections'
+require 'faraday'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
 
@@ -32,6 +33,10 @@ module WebInspector
       @inspector.images
     end
 
+    def meta
+      @inspector.meta
+    end
+
     def url
       normalized_uri
     end
@@ -58,7 +63,7 @@ module WebInspector
         'description'  	=> description,
         'meta'  				=> meta,
         'links'					=> links,
-        'images'				=> images
+        'images'				=> images,
         'response'      => { 'status'  => response.status,
                              'headers' => response.headers }
       }

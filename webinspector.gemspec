@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'webinspector/version'
+require File.expand_path('../lib/web_inspector/version', __FILE__)
 
 Gem::Specification.new do |spec|
   spec.name          = "webinspector"
-  spec.version       = Webinspector::VERSION
+  spec.version       = WebInspector::VERSION
   spec.authors       = ["Davide Santangelo"]
   spec.email         = ["davide.santangelo@gmail.com"]
 
@@ -33,5 +33,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "addressable"
   spec.add_dependency "nokogiri"
   spec.add_dependency "open_uri_redirections"
-  spec.add_dependency "open-uri"
+  spec.add_dependency "openurl"
 end
