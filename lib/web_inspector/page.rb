@@ -8,7 +8,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
 
 module WebInspector
   class Page
-  	attr_reader :url, :scheme, :host, :title, :description, :meta, :links, :images, :size, :response
+  	attr_reader :url, :scheme, :host, :port, :title, :description, :meta, :links, :images, :size, :response
 
     def initialize(url, options = {})
       @url = url
@@ -24,19 +24,12 @@ module WebInspector
       @inspector.description
     end
 
-    def meta
-      @inspector.meta
-    end
-
     def links
       @inspector.links
     end
 
     def images
       @inspector.images
-    end
-  
-    def size
     end
 
     def url
@@ -50,18 +43,22 @@ module WebInspector
     def scheme
       uri.scheme
     end
-    
+
+    def port
+      URI(normalized_uri).port
+    end
+
     def to_hash
       {
         'url'           => url,
         'scheme'        => scheme,
         'host'          => host,
+        'port'          => port,
         'title'         => title,
         'description'  	=> description,
         'meta'  				=> meta,
         'links'					=> links,
-        'images'				=> images,
-        'size'          => size,
+        'images'				=> images
         'response'      => { 'status'  => response.status,
                              'headers' => response.headers }
       }

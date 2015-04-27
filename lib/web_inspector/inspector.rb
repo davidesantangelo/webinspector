@@ -5,7 +5,7 @@ module WebInspector
 
     def initialize(page)
       @page = page
-      @meta = WebInspector::Meta.new(page)
+      @meta = WebInspector::Meta.new(page).meta
     end
 
   	def title
@@ -23,7 +23,7 @@ module WebInspector
     def links
       links = []
       @page.css("a").each do |a|
-        links.push((a[:href].to_s.start_with? url.to_s) ? a[:href] : URI.join(url, a[:href]).to_s) if (a and a[:href])
+        links.push((a[:href].to_s.start_with? @url.to_s) ? a[:href] : URI.join(@url, a[:href]).to_s) if (a and a[:href])
       end
       return links
     end
@@ -31,7 +31,7 @@ module WebInspector
     def images
       images = []
       @page.css("img").each do |img|
-        images.push((img[:src].to_s.start_with? url.to_s) ? img[:src] : URI.join(url, img[:src]).to_s) if (img and img[:src])
+        images.push((img[:src].to_s.start_with? @url.to_s) ? img[:src] : URI.join(url, img[:src]).to_s) if (img and img[:src])
       end
       return images
     end
