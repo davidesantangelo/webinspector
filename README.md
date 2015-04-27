@@ -32,7 +32,7 @@ You can check the status and headers from the response like this:
 
 ```ruby
 page.response.status  # 200
-page.response.headers # { "server"=>"nginx", "content-type"=>"text/html; charset=utf-8", "cache-control"=>"must-revalidate, private, max-age=0", ... }
+page.response.headers # { "server"=>"apache", "content-type"=>"text/html; charset=utf-8", "cache-control"=>"must-revalidate, private, max-age=0", ... }
 ```
 
 ## Accessing inpsected data
