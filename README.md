@@ -43,12 +43,12 @@ You can see the data like this:
 page.url                 # URL of the page
 page.scheme              # Scheme of the page (http, https)
 page.host                # Hostname of the page (like, davidesantangelo.com, without the scheme)
+page.port                # Port of the page
 page.title               # title of the page from the head section, as string
-page.links          		 # every link found
-page.meta['keywords']    # meta keywords, as string
-page.meta['description'] # meta description, as string
-page.description         # returns the meta description, or the first long paragraph if no meta description is found
-page.images              # enumerable collection, with every img found on the page as an absolute URL
+page.description         # description of the page
+page.links               # every link found
+page.images              # every image found
+page.meta                # metatags of the page
 ```
 
 ## License
