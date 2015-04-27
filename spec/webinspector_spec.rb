@@ -22,4 +22,9 @@ describe WebInspector do
     expect(page.scheme).to eq("http")
     expect(page.host).to eq("www.davidesantangelo.com")
   end
+
+  it 'expect to_hash from davidesantangelo.com page' do
+    page = WebInspector.new(url)
+    puts page.meta
+  end
 end

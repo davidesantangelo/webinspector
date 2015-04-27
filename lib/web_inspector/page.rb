@@ -24,6 +24,21 @@ module WebInspector
       @inspector.description
     end
 
+    def meta
+      @inspector.meta
+    end
+
+    def links
+      @inspector.links
+    end
+
+    def images
+      @inspector.images
+    end
+  
+    def size
+    end
+
     def url
       normalized_uri
     end
@@ -52,8 +67,38 @@ module WebInspector
       }
     end
 
+    def response
+      @response ||= fetch
+    rescue Faraday::TimeoutError, Faraday::Error::ConnectionFailed, RuntimeError, URI::InvalidURIError => e
+      @exception_log << e
+      nil
+    end
+
     private
     
+    def fetch
+      session = Faraday.new(:url => url) do |faraday|
+        faraday.request :retry, max: @retries
+
+        if @allow_redirections
+          faraday.use FaradayMiddleware::FollowRedirects, limit: 10
+          faraday.use :cookie_jar
+        end
+
+        faraday.headers.merge!(@headers || {})
+        faraday.adapter :net_http
+      end
+
+      response = session.get do |req|
+        req.options.timeout      = @connection_timeout
+        req.options.open_timeout = @read_timeout
+      end
+
+      @url.url = response.env.url.to_s
+
+      response
+    end
+
     def uri
       Addressable::URI.parse(@url)
     end
@@ -65,7 +110,7 @@ module WebInspector
     def default_user_agent
       "WebInspector/#{WebInspector::VERSION} (+https://github.com/davidesantangelo/webinspector)"
     end
-    
+
     def page
       Nokogiri::HTML(open(normalized_uri, :allow_redirections => :safe))
     end
