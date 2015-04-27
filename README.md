@@ -49,6 +49,8 @@ page.meta['keywords']    # meta keywords, as string
 page.meta['description'] # meta description, as string
 page.description         # returns the meta description, or the first long paragraph if no meta description is found
 page.images              # enumerable collection, with every img found on the page as an absolute URL
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
