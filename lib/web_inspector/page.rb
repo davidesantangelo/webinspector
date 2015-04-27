@@ -1,11 +1,11 @@
 require 'nokogiri'
 require 'uri'
-require 'addressable/uri'
 require 'open-uri'
 require 'open_uri_redirections'
 require 'faraday'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'uri'))
 
 module WebInspector
   class Page
@@ -14,6 +14,7 @@ module WebInspector
     def initialize(url, options = {})
       @url = url
       @options = options
+      @uri = WebInspector::Uri.new(url)
       @inspector = WebInspector::Inspector.new(page)
     end
 
@@ -38,19 +39,19 @@ module WebInspector
     end
 
     def url
-      normalized_uri
+      @uri.url
     end
 
     def host
-      uri.host
+      @uri.host
     end
 
     def scheme
-      uri.scheme
+      @uri.scheme
     end
 
     def port
-      URI(normalized_uri).port
+      @uri.port
     end
 
     def to_hash
@@ -101,20 +102,12 @@ module WebInspector
       response
     end
 
-    def uri
-      Addressable::URI.parse(@url)
-    end
-
-    def normalized_uri
-      uri.normalize.to_s
-    end
-
     def default_user_agent
       "WebInspector/#{WebInspector::VERSION} (+https://github.com/davidesantangelo/webinspector)"
     end
 
     def page
-      Nokogiri::HTML(open(normalized_uri, :allow_redirections => :safe))
+      Nokogiri::HTML(open(@uri.url, :allow_redirections => :safe))
     end
   end
 end
