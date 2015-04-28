@@ -51,6 +51,15 @@ page.images              # every image found
 page.meta                # metatags of the page
 ```
 
+## Accessing meta tags
+
+```ruby
+page.meta                 # metatags of the page
+page.meta['description']  # meta description
+page.meta['keywors']      # meta keywords
+```
+
+
 ## License
 The restcountry GEM is released under the MIT License.
 
