@@ -9,7 +9,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
 
 module WebInspector
   class Page
-  	attr_reader :url, :scheme, :host, :port, :title, :description, :meta, :links, :images, :size, :response
+  	attr_reader :url, :scheme, :host, :port, :title, :description, :meta, :links, :images, :response
 
     def initialize(url, options = {})
       @url = url
@@ -73,7 +73,6 @@ module WebInspector
     def response
       @response ||= fetch
     rescue Faraday::TimeoutError, Faraday::Error::ConnectionFailed, RuntimeError, URI::InvalidURIError => e
-      @exception_log << e
       nil
     end
 
@@ -101,7 +100,6 @@ module WebInspector
 
       response
     end
-
 
     def with_default_scheme(request)
       request.url && request.scheme.nil? ? 'http://' + request.url : request.url

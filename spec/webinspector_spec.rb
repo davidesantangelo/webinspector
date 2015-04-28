@@ -29,9 +29,8 @@ describe WebInspector do
     expect(page.port).to eq(80)
   end
 
-  it 'expect to_hash from davidesantangelo.com page' do
+  it 'expect www.davidesantangelo.com host from davidesantangelo.com page' do
     page = WebInspector.new(url)
-    puts page.size
     expect(page.host).to eq("www.davidesantangelo.com")
   end
 end
