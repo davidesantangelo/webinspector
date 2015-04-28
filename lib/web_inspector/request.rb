@@ -26,6 +26,8 @@ module WebInspector
 
     def uri
       Addressable::URI.parse(@url)
+    rescue Addressable::URI::InvalidURIError => e
+      nil
     end
 
     def normalized_uri

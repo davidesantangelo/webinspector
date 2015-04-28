@@ -102,12 +102,17 @@ module WebInspector
       response
     end
 
+
+    def with_default_scheme(request)
+      request.url && request.scheme.nil? ? 'http://' + request.url : request.url
+    end
+
     def default_user_agent
       "WebInspector/#{WebInspector::VERSION} (+https://github.com/davidesantangelo/webinspector)"
     end
 
     def page
-      Nokogiri::HTML(open(@request.url, :allow_redirections => :safe))
+      Nokogiri::HTML(open(with_default_scheme(@request), :allow_redirections => :safe))
     end
   end
 end
