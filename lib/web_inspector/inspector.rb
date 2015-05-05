@@ -8,9 +8,9 @@ module WebInspector
       @meta = WebInspector::Meta.new(page).meta
     end
 
-  	def title
-  		@page.css('title').inner_text.strip rescue nil
-  	end
+    def title
+      @page.css('title').inner_text.strip rescue nil
+    end
 
     def description
       @meta['description'] || snippet

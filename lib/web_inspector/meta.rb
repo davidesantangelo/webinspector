@@ -4,7 +4,7 @@ module WebInspector
       @page = page
     end
 
-  	def meta_tags
+    def meta_tags
       {
         'name'        => meta_tags_by('name'),
         'http-equiv'  => meta_tags_by('http-equiv'),

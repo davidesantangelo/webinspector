@@ -2,11 +2,11 @@ require 'addressable/uri'
 
 module WebInspector
   class Request
-  	def initialize(url)
-  		@url = url
-  	end
+    def initialize(url)
+      @url = url
+    end
 
-  	def url
+    def url
       normalized_uri
     end
 

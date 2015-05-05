@@ -33,4 +33,9 @@ describe WebInspector do
     page = WebInspector.new(url)
     expect(page.host).to eq("www.davidesantangelo.com")
   end
+
+  it 'expect links.size > 0 from davidesantangelo.com page' do
+    page = WebInspector.new(url)
+    expect(page.links.size).to be > 0
+  end
 end

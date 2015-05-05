@@ -9,7 +9,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
 
 module WebInspector
   class Page
-  	attr_reader :url, :scheme, :host, :port, :title, :description, :meta, :links, :images, :response
+    attr_reader :url, :scheme, :host, :port, :title, :description, :meta, :links, :images, :response
 
     def initialize(url, options = {})
       @url = url
@@ -110,7 +110,7 @@ module WebInspector
     end
 
     def page
-      Nokogiri::HTML(open(with_default_scheme(@request), :allow_redirections => :safe))
+      Nokogiri::HTML(open(with_default_scheme(@request), allow_redirections: :safe))
     end
   end
 end
