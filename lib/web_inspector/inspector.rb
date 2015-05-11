@@ -16,6 +16,10 @@ module WebInspector
       @meta['description'] || snippet
     end
 
+    def body
+      @page.css('body').to_html
+    end
+
     def meta
       @meta
     end
