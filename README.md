@@ -2,6 +2,9 @@
 
 Ruby gem to inspect completely a web page. It scrapes a given URL, and returns you its title, description, meta, links, images and more.
 
+## See it in action!
+
+You can try MetaInspector live at this little demo: [https://metainspectordemo.herokuapp.com](https://metainspectordemo.herokuapp.com)
 ## Installation
 
 Add this line to your application's Gemfile:
