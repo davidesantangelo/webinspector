@@ -6,6 +6,7 @@ require 'faraday'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'blog'))
 
 module WebInspector
   class Page
