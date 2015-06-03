@@ -17,6 +17,7 @@ module WebInspector
       @options = options
       @request = WebInspector::Request.new(url)
       @inspector = WebInspector::Inspector.new(page)
+      @blog = WebInspector::Blog.new(page)
     end
 
     def title
