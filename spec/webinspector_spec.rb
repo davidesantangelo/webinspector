@@ -43,4 +43,25 @@ describe WebInspector do
     page = WebInspector.new(url)
     expect(page.body.length).to be > 0
   end
+
+
+
+  # added tests
+  it 'expect first blog entry on page' do
+    first_blog = "Today I want to talk you about TUNSTUNS is a funny open source personal project (Rails + Slim + SASS + Sidekiq + Bootstrap + JS). It allow you to keep track of your twitter unffollower. With TUNS you will receive a notification when someone unfollow or return to follow you back.After it is launched on Product Hunt he has been a great success. At the moment more then 500 users and 1100 unfollower notification :). Obviously i'm working on new features and improvements to offer to the user a useful, clean and funny service. if you want to try and tell me what you think, feedbacks are always welcome!"
+    page = WebInspector.new("http://www.davidesantangelo.com/blog")
+    expect(page.first_blog_post_content).to eq(first_blog)
+  end
+
+  it 'expect first title to equal - TUNS' do
+    page = WebInspector.new("http://www.davidesantangelo.com/blog")
+    expect(page.all_posts[0][:title]).to eq('TUNS')
+  end
+
+  it 'expect first blog title of another blog' do
+    page = WebInspector.new("http://www.colinw.info/posts")
+    expect(page.all_posts.length).to be > 0
+    pp "Post Title: #{page.all_posts[0][:title]}"
+  end
+
 end
