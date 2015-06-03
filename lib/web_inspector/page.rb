@@ -58,6 +58,27 @@ module WebInspector
       @request.port
     end
 
+    # added methods
+    # returns the content of the first blog post on the page.
+    def first_blog_post_content
+      @blog.first_blog_post_content
+    end
+
+    # array of all posts on the page.
+    def all_posts
+      if @blog.all_posts
+        return_array = []
+        @blog.all_posts.each do |post|
+          return_array << { title: post.css('h2').empty? ? post.css('h1').text : post.css('h2').text,
+                            content: post.css('p').text }
+        end
+        return_array
+      else
+        []
+      end
+    end
+    # end added methods
+
     def to_hash
       {
         'url'           => url,
