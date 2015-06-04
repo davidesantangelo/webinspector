@@ -7,14 +7,19 @@ describe WebInspector do
     expect(WebInspector::VERSION).not_to be nil
   end
 
+  it 'should recieve response code 200' do
+    page = WebInspector.new(url)
+    expect(page.response.status).to eq(200)
+  end
+
   it 'expect Davide Santangelo - Passionate Web Developer title' do
   	page = WebInspector.new(url)
     expect(page.title).to eq("Davide Santangelo - Passionate Web Developer")
   end
 
-  it 'expect Davide Santangelo - Passionate Web Developer. In love with Ruby description' do
+  it 'expect Davide Santangelo - Passionate Web Developer. API specialist. In love with Ruby. meta description' do 
     page = WebInspector.new(url)
-    expect(page.description).to eq("Davide Santangelo - Passionate Web Developer. In love with Ruby")
+    expect(page.description).to eq("Davide Santangelo - Passionate Web Developer. API specialist. In love with Ruby.")
   end
 
   it 'expect http://www.davidesantangelo.com/ url' do

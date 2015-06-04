@@ -100,7 +100,7 @@ module WebInspector
         req.options.open_timeout = @read_timeout
       end
 
-      @url.url = response.env.url.to_s
+      @url = response.env.url.to_s
 
       response
     end
