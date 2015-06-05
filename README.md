@@ -62,6 +62,9 @@ page.meta['description']  # meta description
 page.meta['keywords']      # meta keywords
 ```
 
+## Contributors
+
+  * Steven Shelby ([@stevenshelby](https://github.com/stevenshelby))
 
 ## License
 The webinspector GEM is released under the MIT License.
