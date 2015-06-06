@@ -6,6 +6,7 @@ require 'faraday'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
+require File.expand_path(File.join(File.dirname(__FILE__), 'blog'))
 
 module WebInspector
   class Page
@@ -16,6 +17,7 @@ module WebInspector
       @options = options
       @request = WebInspector::Request.new(url)
       @inspector = WebInspector::Inspector.new(page)
+      @blog = WebInspector::Blog.new(page)
     end
 
     def title
@@ -57,6 +59,27 @@ module WebInspector
     def port
       @request.port
     end
+
+    # added methods
+    # returns the content of the first blog post on the page.
+    def first_blog_post_content
+      @blog.first_blog_post_content
+    end
+
+    # array of all posts on the page.
+    def all_posts
+      if @blog.all_posts
+        return_array = []
+        @blog.all_posts.each do |post|
+          return_array << { title: post.css('h2').empty? ? post.css('h1').text : post.css('h2').text,
+                            content: post.css('p').text }
+        end
+        return_array
+      else
+        []
+      end
+    end
+    # end added methods
 
     def to_hash
       {
