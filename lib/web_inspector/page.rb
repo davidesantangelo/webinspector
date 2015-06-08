@@ -58,7 +58,7 @@ module WebInspector
       @request.port
     end
 
-    def domain_links(u = nil)
+    def domain_links(u = host)
       @inspector.domain_links(u)
     end
 
