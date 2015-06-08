@@ -58,6 +58,10 @@ module WebInspector
       @request.port
     end
 
+    def domain_links(u)
+      @request.domain_links(u)
+    end
+
     def to_hash
       {
         'url'           => url,
