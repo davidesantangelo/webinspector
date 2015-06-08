@@ -58,8 +58,8 @@ module WebInspector
       @request.port
     end
 
-    def domain_links(u)
-      @request.domain_links(u)
+    def domain_links(u = nil)
+      @inspector.domain_links(u)
     end
 
     def to_hash
