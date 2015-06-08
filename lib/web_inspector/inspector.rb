@@ -44,9 +44,9 @@ module WebInspector
         next unless u && u.host
         
         domain_links.push(l) if domain == u.host.downcase
-      end 
+      end
       
-      return domain_links.compact!
+      return domain_links.compact
     end
     
     def validate_url(u)
