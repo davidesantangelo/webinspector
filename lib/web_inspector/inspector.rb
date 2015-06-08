@@ -31,7 +31,7 @@ module WebInspector
     
     # View only the links to a given domain
     # Use the page's domain as the default
-    def domain_links(user_domain = @page.host)
+    def domain_links(user_domain)
       validated_domain_uri = validate_url("http://#{user_domain.downcase.gsub(/\s+/, '')}")
       raise "Invalid domain provided" unless validated_domain_uri
       
