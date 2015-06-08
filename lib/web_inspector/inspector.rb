@@ -41,7 +41,7 @@ module WebInspector
       
       links.map do |l|
         u = validate_url(l)
-        next unless u
+        next unless u && u.host
         
         domain_links.push(l) if domain == u.host.downcase
       end 
