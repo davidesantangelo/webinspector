@@ -39,7 +39,7 @@ module WebInspector
       
       domain_links = []
       
-      links.map do |l|
+      links.each do |l|
         u = validate_url(l)
         next unless u && u.host
         
