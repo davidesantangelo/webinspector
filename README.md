@@ -65,6 +65,7 @@ page.meta['keywords']      # meta keywords
 ## Contributors
 
   * Steven Shelby ([@stevenshelby](https://github.com/stevenshelby))
+	* Sam Nissen ([@samnissen](https://github.com/samnissen))
 
 ## License
 The webinspector GEM is released under the MIT License.
