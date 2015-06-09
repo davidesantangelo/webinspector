@@ -48,4 +48,27 @@ describe WebInspector do
     page = WebInspector.new(url)
     expect(page.body.length).to be > 0
   end
+  
+  it 'expect domain images to include all images hosted at the domain' do
+    page = WebInspector.new("http://www.google.com") #=> davidesantangelo.com has no images...
+    
+    da_images = page.images.map{|l| 
+      l if ("#{l}".start_with?("/") && "#{l}".match(/\A(htt(ps|p)\:\/\/(www\.google\.com|google\.com)|(www\.google\.com|google\.com))|\//))
+    }.compact
+    
+    # Our regular expression is theoretically more forgiving than our URL validation.
+    # So, we should expect that the links it finds to be gt or equal to the `page.links`.
+    expect(da_images.size).to be >= page.domain_images.size
+  end
+  
+  it 'expect domain links to include all links pointed at the domain' do
+    page = WebInspector.new(url)
+    da_links = page.links.map{|l| 
+      l if ("#{l}".start_with?("/") && "#{l}".match(/\A(htt(ps|p)\:\/\/(www\.davidesantangelo\.com|davidesantangelo\.com)|(www\.davidesantangelo\.com|davidesantangelo\.com))|\//))
+    }.compact
+    
+    # Our regular expression is theoretically more forgiving than our URL validation.
+    # So, we should expect that the links it finds to be gt or equal to the `page.links`.
+    expect(da_links.size).to be >= page.domain_links.size
+  end
 end

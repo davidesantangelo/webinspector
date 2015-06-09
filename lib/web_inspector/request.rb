@@ -13,6 +13,10 @@ module WebInspector
     def host
       uri.host
     end
+    
+    def domain
+      suffix_domain
+    end
 
     def scheme
       uri.scheme
@@ -23,7 +27,17 @@ module WebInspector
     end 
 
     private
-
+    
+    def suffix_domain
+      return @domain if @domain
+      
+      begin
+        @domain = PublicSuffix.parse(host).domain
+      rescue URI::InvalidURIError, PublicSuffix::DomainInvalid => e
+        @domain = ''
+      end
+    end
+    
     def uri
       Addressable::URI.parse(@url)
     rescue Addressable::URI::InvalidURIError => e

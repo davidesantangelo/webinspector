@@ -29,30 +29,71 @@ module WebInspector
       return @links
     end
     
-    # View only the links to a given domain
-    # Use the page's domain as the default
-    def domain_links(user_domain)
-      validated_domain_uri = validate_url("http://#{user_domain.downcase.gsub(/\s+/, '')}")
+    def domain_links(user_domain, host)
+      @host ||= host
+      
+      validated_domain_uri = validate_url_domain("http://#{user_domain.downcase.gsub(/\s+/, '')}")
       raise "Invalid domain provided" unless validated_domain_uri
       
-      domain = validated_domain_uri.host
+      domain = validated_domain_uri.domain
       
       domain_links = []
       
       links.each do |l|
-        u = validate_url(l)
-        next unless u && u.host
         
-        domain_links.push(l) if domain == u.host.downcase
+        u = validate_url_domain(l)
+        next unless u && u.domain
+        
+        domain_links.push(l) if domain == u.domain.downcase
       end
       
       return domain_links.compact
     end
     
-    def validate_url(u)
+    def domain_images(user_domain, host)
+      @host ||= host
+      
+      validated_domain_uri = validate_url_domain("http://#{user_domain.downcase.gsub(/\s+/, '')}")
+      raise "Invalid domain provided" unless validated_domain_uri
+      
+      domain = validated_domain_uri.domain
+      
+      domain_images = []
+      
+      images.each do |img|
+        u = validate_url_domain(img)
+        next unless u && u.domain
+        
+        domain_images.push(img) if u.domain.downcase.end_with?(domain)
+      end
+      
+      return domain_images.compact
+    end
+    
+    # Normalize and validate the URLs on the page for comparison
+    def validate_url_domain(u)
+      # Enforce a few bare standards before proceeding
+      u = "#{u}" 
+      u = "/" if u.empty?
+      
       begin
-        return URI.parse(u)
-      rescue URI::InvalidURIError => e
+        # Look for evidence of a host. If this is a relative link
+        # like '/contact', add the page host.
+        domained_url   = @host + u unless (u.split("/").first || "").match(/(\:|\.)/)
+        domained_url ||= u
+        
+        # http the URL if it is missing
+        httpped_url   = "http://" + domained_url unless domained_url[0..3] == 'http'
+        httpped_url ||= domained_url
+        
+        # Make sure the URL parses
+        uri     = URI.parse(httpped_url)
+        
+        # Make sure the URL passes ICANN rules.
+        # The PublicSuffix object splits the domain and subdomain
+        # (unlike URI), which allows more liberal URL matching.
+        return PublicSuffix.parse(uri.host)
+      rescue URI::InvalidURIError, PublicSuffix::DomainInvalid => e
         return false
       end
     end
