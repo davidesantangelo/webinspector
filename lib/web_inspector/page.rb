@@ -3,13 +3,14 @@ require 'uri'
 require 'open-uri'
 require 'open_uri_redirections'
 require 'faraday'
+require 'public_suffix'
 
 require File.expand_path(File.join(File.dirname(__FILE__), 'inspector'))
 require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
 
 module WebInspector
   class Page
-    attr_reader :url, :scheme, :host, :port, :title, :description, :body, :meta, :links, :images, :response
+    attr_reader :url, :scheme, :host, :port, :title, :description, :body, :meta, :links, :domain_links, :domain_images, :images, :response
 
     def initialize(url, options = {})
       @url = url
@@ -50,12 +51,24 @@ module WebInspector
       @request.host
     end
 
+    def domain
+      @request.domain
+    end
+
     def scheme
       @request.scheme
     end
 
     def port
       @request.port
+    end
+
+    def domain_links(u = domain)
+      @inspector.domain_links(u, host)
+    end
+
+    def domain_images(u = domain)
+      @inspector.domain_images(u, host)
     end
 
     def to_hash

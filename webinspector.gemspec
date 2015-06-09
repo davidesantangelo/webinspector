@@ -34,4 +34,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "nokogiri"
   spec.add_dependency "open_uri_redirections"
   spec.add_dependency "openurl"
+  spec.add_dependency "public_suffix"
 end
