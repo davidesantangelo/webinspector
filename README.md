@@ -71,7 +71,7 @@ page.find(["word1, word2"]) # return {"word1"=>3, "word2"=>1}
 ## Contributors
 
   * Steven Shelby ([@stevenshelby](https://github.com/stevenshelby))
-	* Sam Nissen ([@samnissen](https://github.com/samnissen))
+  * Sam Nissen ([@samnissen](https://github.com/samnissen))
 
 ## License
 The webinspector GEM is released under the MIT License.

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe WebInspector do
-	let(:url) { "http://www.davidesantangelo.com" }
+  let(:url) { "http://www.davidesantangelo.com" }
 
   it 'has a version number' do
     expect(WebInspector::VERSION).not_to be nil
