@@ -59,8 +59,14 @@ page.meta                # metatags of the page
 ```ruby
 page.meta                 # metatags of the page
 page.meta['description']  # meta description
-page.meta['keywords']      # meta keywords
+page.meta['keywords']     # meta keywords
 ```
+
+## Find words (as array)
+```ruby
+page.find(["word1, word2"]) # return {"word1"=>3, "word2"=>1}
+```
+
 
 ## Contributors
 

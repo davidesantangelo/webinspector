@@ -43,6 +43,10 @@ module WebInspector
       @inspector.meta
     end
 
+    def find(words)
+      @inspector.find(words)
+    end
+
     def url
       @request.url
     end

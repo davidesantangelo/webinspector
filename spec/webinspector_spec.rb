@@ -71,4 +71,9 @@ describe WebInspector do
     # So, we should expect that the links it finds to be gt or equal to the `page.links`.
     expect(da_links.size).to be >= page.domain_links.size
   end
+
+  it 'expect rails count > 1 from url' do
+    page = WebInspector.new(url)
+    expect(page.find(['rails']).size).to be > 0
+  end
 end

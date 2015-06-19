@@ -24,6 +24,11 @@ module WebInspector
       @meta
     end
 
+    def find(words)
+      text = @page.at('html').inner_text   
+      counter(text.downcase, words)
+    end
+
     def links
       get_new_links unless @links
       return @links
@@ -105,6 +110,18 @@ module WebInspector
 
     private
     
+    def counter(text, words)
+      results = []
+      hash = Hash.new
+
+      words.each do |word|
+        hash[word] = text.scan(/#{word.downcase}/).size
+        results.push(hash)
+        hash = Hash.new
+      end
+      return results
+    end
+
     def get_new_images
       @images = []
       @page.css("img").each do |img|
