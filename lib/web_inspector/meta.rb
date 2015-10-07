@@ -1,6 +1,6 @@
 module WebInspector
   class Meta
-  	def initialize(page)
+    def initialize(page)
       @page = page
     end
 
@@ -38,7 +38,7 @@ module WebInspector
       @page.css("meta[http-equiv='Content-Type']")[0].attributes['content'].value.split(';')[1].split('=')[1] rescue nil
     end
 
-   	def meta_tags_by(attribute)
+    def meta_tags_by(attribute)
       hash = {}
       @page.css("meta[@#{attribute}]").map do |tag|
         name    = tag.attributes[attribute].value.downcase rescue nil

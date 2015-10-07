@@ -30,7 +30,7 @@ module WebInspector
     def body
       @inspector.body
     end
-    
+
     def links
       @inspector.links
     end
@@ -93,12 +93,12 @@ module WebInspector
 
     def response
       @response ||= fetch
-    rescue Faraday::TimeoutError, Faraday::Error::ConnectionFailed, RuntimeError, URI::InvalidURIError => e
+    rescue Faraday::TimeoutError, Faraday::Error::ConnectionFailed, RuntimeError, URI::InvalidURIError
       nil
     end
 
     private
-    
+
     def fetch
       session = Faraday.new(:url => url) do |faraday|
         faraday.request :retry, max: @retries
