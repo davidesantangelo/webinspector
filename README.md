@@ -2,6 +2,8 @@
 
 Ruby gem to inspect completely a web page. It scrapes a given URL, and returns you its title, description, meta, links, images and more.
 
+<a href="https://codeclimate.com/github/davidesantangelo/webinspector"><img src="https://codeclimate.com/github/davidesantangelo/webinspector/badges/gpa.svg" /></a>
+
 ## See it in action!
 
 You can try WebInspector live at this little demo: [https://scrappet.herokuapp.com](https://scrappet.herokuapp.com)
