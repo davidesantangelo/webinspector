@@ -1,12 +1,10 @@
-# Webinspector
+# WebInspector
 
-Ruby gem to inspect completely a web page. It scrapes a given URL, and returns you its title, description, meta, links, images and more.
+Ruby gem to inspect web pages. It scrapes a given URL and returns its title, description, meta tags, links, images, and more.
 
 <a href="https://codeclimate.com/github/davidesantangelo/webinspector"><img src="https://codeclimate.com/github/davidesantangelo/webinspector/badges/gpa.svg" /></a>
 
-## See it in action!
 
-You can try WebInspector live at this little demo: [https://scrappet.herokuapp.com](https://scrappet.herokuapp.com)
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -25,50 +23,74 @@ Or install it yourself as:
 
 ## Usage
 
-Initialize a WebInspector instance for an URL, like this:
+### Initialize a WebInspector instance
 
 ```ruby
-page = WebInspector.new('http://davidesantangelo.com')
+page = WebInspector.new('http://example.com')
 ```
 
-## Accessing response status and headers
+### With options
 
-You can check the status and headers from the response like this:
+```ruby
+page = WebInspector.new('http://example.com', {
+  timeout: 30,                         # Request timeout in seconds (default: 30)
+  retries: 3,                          # Number of retries (default: 3) 
+  headers: {'User-Agent': 'Custom UA'} # Custom HTTP headers
+})
+```
+
+### Accessing response status and headers
 
 ```ruby
 page.response.status  # 200
-page.response.headers # { "server"=>"apache", "content-type"=>"text/html; charset=utf-8", "cache-control"=>"must-revalidate, private, max-age=0", ... }
+page.response.headers # { "server"=>"apache", "content-type"=>"text/html; charset=utf-8", ... }
+page.status_code      # 200
+page.success?         # true if the page was loaded successfully
+page.error_message    # returns the error message if any
 ```
 
-## Accessing inpsected data
-
-You can see the data like this:
+### Accessing page data
 
 ```ruby
-page.url                 # URL of the page
-page.scheme              # Scheme of the page (http, https)
-page.host                # Hostname of the page (like, davidesantangelo.com, without the scheme)
-page.port                # Port of the page
-page.title               # title of the page from the head section, as string
-page.description         # description of the page
-page.links               # every link found
-page.images              # every image found
-page.meta                # metatags of the page
+page.url           # URL of the page
+page.scheme        # Scheme of the page (http, https)
+page.host          # Hostname of the page (like, example.com, without the scheme)
+page.port          # Port of the page
+page.title         # title of the page from the head section
+page.description   # description of the page
+page.links         # array of all links found on the page (absolute URLs)
+page.images        # array of all images found on the page (absolute URLs)
+page.meta          # meta tags of the page
+page.favicon       # favicon URL if available
 ```
 
-## Accessing meta tags
+### Working with meta tags
 
 ```ruby
-page.meta                 # metatags of the page
+page.meta                 # all meta tags
 page.meta['description']  # meta description
 page.meta['keywords']     # meta keywords
+page.meta['og:title']     # OpenGraph title
 ```
 
-## Find words (as array)
+### Filtering links and images by domain
+
 ```ruby
-page.find(["word1, word2"]) # return {"word1"=>3, "word2"=>1}
+page.domain_links('example.com')  # returns only links pointing to example.com
+page.domain_images('example.com') # returns only images hosted on example.com
 ```
 
+### Searching for words
+
+```ruby
+page.find(["ruby", "rails"]) # returns [{"ruby"=>3}, {"rails"=>1}]
+```
+
+### Export all data to JSON
+
+```ruby
+page.to_hash # returns a hash with all page data
+```
 
 ## Contributors
 
@@ -76,13 +98,13 @@ page.find(["word1, word2"]) # return {"word1"=>3, "word2"=>1}
   * Sam Nissen ([@samnissen](https://github.com/samnissen))
 
 ## License
-The webinspector GEM is released under the MIT License.
+
+The WebInspector gem is released under the MIT License.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/webinspector/fork )
+1. Fork it ( https://github.com/davidesantangelo/webinspector/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
->>>>>>> develop
