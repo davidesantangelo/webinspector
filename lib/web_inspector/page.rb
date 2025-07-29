@@ -19,8 +19,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'request'))
 
 module WebInspector
   class Page
-    attr_reader :url, :scheme, :host, :port, :title, :description, :body, :meta, :links,
-                :domain_links, :domain_images, :images, :response, :status_code, :favicon
+    attr_reader :status_code
 
     DEFAULT_TIMEOUT = 30
     DEFAULT_RETRIES = 3
@@ -70,7 +69,8 @@ module WebInspector
     end
 
     # Delegate methods to inspector
-    %i[title description body links images meta].each do |method|
+    %i[title description body links images meta javascripts stylesheets language structured_data microdata
+       tag_count].each do |method|
       define_method(method) do
         return nil unless success?
 
@@ -132,8 +132,99 @@ module WebInspector
       @inspector.domain_images(u, host)
     end
 
-    # Get full JSON representation of the page
-    #
+    # Get information about the page's security
+    # @return [Hash] Security information
+    def security_info
+      return @security_info if defined?(@security_info)
+
+      @security_info = {
+        secure: scheme == 'https',
+        hsts: response&.headers && response.headers['strict-transport-security'] ? true : false,
+        content_security_policy: response&.headers && response.headers['content-security-policy'] ? true : false
+      }
+
+      # Extract SSL/TLS info if available and using HTTPS
+      if scheme == 'https' && response&.env&.response_headers
+        @security_info[:ssl_version] = response.env[:ssl_version]
+        @security_info[:cipher_suite] = response.env[:cipher_suite]
+      end
+
+      @security_info
+    end
+
+    # Get the content type of the page
+    # @return [String, nil] Content type
+    def content_type
+      response&.headers && response.headers['content-type']
+    end
+
+    # Get the size of the page in bytes
+    # @return [Integer, nil] Size in bytes
+    def size
+      return @size if defined?(@size)
+
+      @size = if response&.headers && response.headers['content-length']
+                response.headers['content-length'].to_i
+              elsif response&.body
+                response.body.bytesize
+              end
+    end
+
+    # Get the load time of the page in seconds
+    # @return [Float, nil] Load time in seconds
+    attr_reader :load_time
+
+    # Get all JSON-LD structured data as a hash
+    # @return [Array<Hash>] Structured data
+    def json_ld
+      structured_data
+    end
+
+    # Get a hash of all technologies detected on the page
+    # @return [Hash] Detected technologies
+    def technologies
+      techs = {}
+      js_files = javascripts || []
+      css_files = stylesheets || []
+      page_body = body || ''
+      page_meta = meta || {}
+      response_headers = response&.headers || {}
+
+      # Frameworks and Libraries
+      techs[:jquery] = true if js_files.any? { |js| js.include?('jquery') } || page_body.include?('jQuery')
+      techs[:react] = true if page_body.include?('data-reactroot') || js_files.any? { |js| js.include?('react') }
+      techs[:vue] = true if page_body.include?('data-v-app') || js_files.any? { |js| js.include?('vue') }
+      techs[:angular] = true if page_body.include?('ng-version') || js_files.any? { |js| js.include?('angular') }
+      techs[:bootstrap] = true if css_files.any? do |css|
+        css.include?('bootstrap')
+      end || page_body.include?('class="container"')
+      if response_headers['x-powered-by']&.include?('Rails') || response_headers.key?('x-rails-env')
+        techs[:rails] =
+          true
+      end
+      techs[:php] = true if response_headers['x-powered-by']&.include?('PHP')
+
+      # CMS
+      techs[:wordpress] = true if page_meta['generator']&.include?('WordPress') || page_body.include?('/wp-content/')
+      techs[:shopify] = true if page_body.include?('Shopify.shop')
+
+      # Analytics
+      techs[:google_analytics] = true if js_files.any? { |js| js.include?('google-analytics.com') }
+
+      # Server
+      server = response_headers['server']
+      if server
+        techs[:server] = server
+        techs[:nginx] = true if server.include?('nginx')
+        techs[:apache] = true if server.include?('Apache')
+        techs[:iis] = true if server.include?('IIS')
+        techs[:express] = true if response_headers['x-powered-by']&.include?('Express')
+      end
+
+      techs
+    end
+
+    # Get full JSON representation of the page with all new data
     # @return [Hash] JSON representation of the page
     def to_hash
       {
@@ -146,7 +237,18 @@ module WebInspector
         'meta' => meta,
         'links' => links,
         'images' => images,
+        'javascripts' => javascripts,
+        'stylesheets' => stylesheets,
         'favicon' => favicon,
+        'language' => language,
+        'structured_data' => structured_data,
+        'microdata' => microdata,
+        'security_info' => security_info,
+        'content_type' => content_type,
+        'size' => size,
+        'load_time' => load_time,
+        'technologies' => technologies,
+        'tag_count' => tag_count,
         'response' => {
           'status' => status_code,
           'headers' => response&.headers || {},
@@ -166,6 +268,8 @@ module WebInspector
     private
 
     def fetch
+      start_time = Time.now
+
       session = Faraday.new(url: url) do |faraday|
         # Configure retries based on available middleware
         faraday.request :retry, { max: @retries } if defined?(Faraday::Retry)
@@ -194,6 +298,7 @@ module WebInspector
         end
 
         @url = response.env.url.to_s
+        @load_time = Time.now - start_time
         response
       rescue Faraday::TimeoutError, Faraday::ConnectionFailed => e
         retries += 1

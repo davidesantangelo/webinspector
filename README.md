@@ -86,6 +86,58 @@ page.domain_images('example.com') # returns only images hosted on example.com
 page.find(["ruby", "rails"]) # returns [{"ruby"=>3}, {"rails"=>1}]
 ```
 
+#### JavaScript and Stylesheets
+
+```ruby
+page.javascripts  # array of all JavaScript files (absolute URLs)
+page.stylesheets  # array of all CSS stylesheets (absolute URLs)
+```
+
+#### Language Detection
+
+```ruby
+page.language  # detected language code (e.g., "en", "es", "fr")
+```
+
+#### Structured Data
+
+```ruby
+page.structured_data  # array of JSON-LD structured data objects
+page.microdata        # array of microdata items
+page.json_ld          # alias for structured_data
+```
+
+#### Security Information
+
+```ruby
+page.security_info  # hash with security details: { secure: true, hsts: true, ... }
+```
+
+#### Performance Metrics
+
+```ruby
+page.load_time  # page load time in seconds
+page.size       # page size in bytes
+```
+
+#### Content Type
+
+```ruby
+page.content_type  # content type header (e.g., "text/html; charset=utf-8")
+```
+
+#### Technology Detection
+
+```ruby
+page.technologies  # hash of detected technologies: { jquery: true, react: true, ... }
+```
+
+#### HTML Tag Statistics
+
+```ruby
+page.tag_count  # hash with counts of each HTML tag: { "div" => 45, "p" => 12, ... }
+```
+
 ### Export all data to JSON
 
 ```ruby

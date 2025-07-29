@@ -15,24 +15,24 @@ describe WebInspector do
     expect(page.response.status).to eq(301)
   end
 
-  it 'expect Davide Santangelo - Developer title' do
+  it 'expect Davide Santangelo - Software Engineer title' do
     page = WebInspector.new(url)
-    expect(page.title).to eq('Davide Santangelo - Developer')
+    expect(page.title).to eq('Davide Santangelo - Software Engineer')
   end
 
   it 'expect Davide Santangelo - Passionate Web Developer title' do
     page = WebInspector.new(url)
-    expect(page.title).to eq('Davide Santangelo - Developer')
+    expect(page.title).to eq('Davide Santangelo - Software Engineer')
   end
 
-  it 'expect Davide Santangelo - Passionate Software Developer. API specialist. In love with Ruby, Python and Machine Learning. meta description' do
+  it 'expect Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines meta description' do
     page = WebInspector.new(url)
-    expect(page.description).to eq('Davide Santangelo - Passionate Software Developer. API specialist. In love with Ruby, Python and Machine Learning.')
+    expect(page.description).to eq('Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines')
   end
 
   it 'expect meta description' do
     page = WebInspector.new(url)
-    expect(page.description).to eq('Davide Santangelo - Passionate Software Developer. API specialist. In love with Ruby, Python and Machine Learning.')
+    expect(page.description).to eq('Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines')
   end
 
   it 'expect http://www.davidesantangelo.com/ url' do
@@ -109,7 +109,7 @@ describe WebInspector do
     end
   end
 
-  context 'with new features in v1.0.0' do
+  context 'with new features' do
     it 'can access page favicon if available' do
       page = WebInspector.new(google_url)
 
@@ -129,6 +129,96 @@ describe WebInspector do
       expect(hash['url']).to eq(page.url)
       expect(hash['title']).to eq(page.title)
       expect(hash['response']['success']).to eq(page.success?)
+    end
+  end
+
+  context 'with additional features' do
+    let(:page) { WebInspector.new(url) }
+
+    it 'can extract JavaScript files' do
+      if page.success?
+        expect(page.javascripts).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can extract stylesheets' do
+      if page.success?
+        expect(page.stylesheets).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can detect language' do
+      if page.success?
+        # Language might be nil if not specified in the HTML
+        expect(page.language).to be_a(String) if page.language
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can extract structured data' do
+      if page.success?
+        expect(page.structured_data).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can extract microdata' do
+      if page.success?
+        expect(page.microdata).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'provides security information' do
+      if page.success?
+        expect(page.security_info).to be_a(Hash)
+        expect(page.security_info).to have_key(:secure)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'measures load time' do
+      if page.success?
+        expect(page.load_time).to be_a(Float) if page.load_time
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'detects page size' do
+      if page.success?
+        expect(page.size).to be_an(Integer) if page.size
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'detects technologies used' do
+      if page.success?
+        tech = page.technologies
+        expect(tech).to be_a(Hash)
+        expect(tech[:bootstrap]).to be true
+        expect(tech[:server]).to eq('Netlify')
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'counts HTML tags' do
+      if page.success?
+        expect(page.tag_count).to be_a(Hash)
+        expect(page.tag_count.keys.size).to be > 0
+      else
+        skip "Couldn't access the site"
+      end
     end
   end
 end
