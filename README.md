@@ -4,7 +4,6 @@ Ruby gem to inspect web pages. It scrapes a given URL and returns its title, des
 
 <a href="https://codeclimate.com/github/davidesantangelo/webinspector"><img src="https://codeclimate.com/github/davidesantangelo/webinspector/badges/gpa.svg" /></a>
 
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -34,7 +33,7 @@ page = WebInspector.new('http://example.com')
 ```ruby
 page = WebInspector.new('http://example.com', {
   timeout: 30,                         # Request timeout in seconds (default: 30)
-  retries: 3,                          # Number of retries (default: 3) 
+  retries: 3,                          # Number of retries (default: 3)
   headers: {'User-Agent': 'Custom UA'} # Custom HTTP headers
 })
 ```
@@ -138,16 +137,73 @@ page.technologies  # hash of detected technologies: { jquery: true, react: true,
 page.tag_count  # hash with counts of each HTML tag: { "div" => 45, "p" => 12, ... }
 ```
 
+#### RSS/Atom Feeds
+
+```ruby
+page.feeds  # array of RSS/Atom feed URLs found on the page
+```
+
+#### Social Media Links
+
+```ruby
+page.social_links  # hash of social media profiles: { facebook: "url", twitter: "url", ... }
+```
+
+#### Robots.txt and Sitemap
+
+```ruby
+page.robots_txt_url  # URL to robots.txt
+page.sitemap_url     # array of sitemap URLs
+```
+
+#### CMS Detection
+
+```ruby
+page.cms_info  # hash with CMS details: { name: "WordPress", version: "6.0", themes: [...], plugins: [...] }
+```
+
+#### Accessibility Score
+
+```ruby
+page.accessibility_score  # hash with score (0-100) and details: { score: 85, details: [...] }
+```
+
+#### Mobile-Friendly Check
+
+```ruby
+page.mobile_friendly?  # true if the page has viewport meta tag and responsive CSS
+```
+
 ### Export all data to JSON
 
 ```ruby
 page.to_hash # returns a hash with all page data
 ```
 
+## Changelog
+
+### Version 1.2.0
+
+**New Features:**
+
+- RSS/Atom feed detection with `feeds` method
+- Social media profile extraction with `social_links` method
+- CMS detection and information with `cms_info` method (WordPress, Drupal, Joomla, Shopify, Wix, Squarespace)
+- Accessibility scoring with `accessibility_score` method
+- Mobile-friendly detection with `mobile_friendly?` method
+- Robots.txt and sitemap URL detection with `robots_txt_url` and `sitemap_url` methods
+
+**Improvements:**
+
+- Enhanced `Request` module with `valid?` and `ssl?` methods for better URL validation
+- Improved `Meta` module with author and publisher extraction
+- Better error handling across all modules
+- Performance improvements with internal caching
+
 ## Contributors
 
-  * Steven Shelby ([@stevenshelby](https://github.com/stevenshelby))
-  * Sam Nissen ([@samnissen](https://github.com/samnissen))
+- Steven Shelby ([@stevenshelby](https://github.com/stevenshelby))
+- Sam Nissen ([@samnissen](https://github.com/samnissen))
 
 ## License
 

@@ -26,6 +26,19 @@ module WebInspector
         .merge(meta_tag['property'])
         .merge(meta_tag['itemprop'] || {})
         .merge('charset' => meta_tag['charset'])
+        .merge('author' => author, 'publisher' => publisher)
+    end
+
+    def author
+      meta_tag['name']['author'] || meta_tag['property']['article:author']
+    rescue StandardError
+      nil
+    end
+
+    def publisher
+      meta_tag['property']['article:publisher'] || meta_tag['property']['og:site_name']
+    rescue StandardError
+      nil
     end
 
     def charset

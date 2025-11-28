@@ -70,7 +70,7 @@ module WebInspector
 
     # Delegate methods to inspector
     %i[title description body links images meta javascripts stylesheets language structured_data microdata
-       tag_count].each do |method|
+       tag_count feeds social_links robots_txt_url sitemap_url cms_info accessibility_score mobile_friendly?].each do |method|
       define_method(method) do
         return nil unless success?
 
@@ -249,6 +249,13 @@ module WebInspector
         'load_time' => load_time,
         'technologies' => technologies,
         'tag_count' => tag_count,
+        'feeds' => feeds,
+        'social_links' => social_links,
+        'robots_txt_url' => robots_txt_url,
+        'sitemap_url' => sitemap_url,
+        'cms_info' => cms_info,
+        'accessibility_score' => accessibility_score,
+        'mobile_friendly' => mobile_friendly?,
         'response' => {
           'status' => status_code,
           'headers' => response&.headers || {},

@@ -28,6 +28,22 @@ module WebInspector
       URI(normalized_uri).port
     end
 
+    def valid?
+      !uri.nil? && !uri.host.nil?
+    rescue StandardError
+      false
+    end
+
+    def ssl?
+      scheme == 'https'
+    end
+
+    def error_message
+      return nil if valid?
+
+      'Invalid URL: Unable to parse the provided URL'
+    end
+
     private
 
     def suffix_domain
@@ -47,7 +63,11 @@ module WebInspector
     end
 
     def normalized_uri
+      return '' if uri.nil?
+
       uri.normalize.to_s
+    rescue StandardError
+      @url
     end
   end
 end

@@ -228,6 +228,203 @@ module WebInspector
       tags
     end
 
+    # Extract RSS/Atom feeds from the page
+    # @return [Array<String>] Array of feed URLs
+    def feeds
+      @feeds ||= begin
+        feeds = []
+
+        # Look for feed link tags
+        @page.css('link[type="application/rss+xml"], link[type="application/atom+xml"]').each do |link|
+          href = link[:href]
+          feeds << make_absolute_url(href) if href
+        end
+
+        # Look for common feed patterns in links
+        links.each do |link|
+          feeds << link if link =~ %r{/(feed|rss|atom)(/|\.xml|$)}i
+        end
+
+        feeds.uniq.compact
+      end
+    end
+
+    # Extract social media profile links
+    # @return [Hash] Hash of social platform => URL
+    def social_links
+      @social_links ||= begin
+        socials = {}
+        platforms = {
+          facebook: /facebook\.com/,
+          twitter: /(twitter\.com|x\.com)/,
+          linkedin: /linkedin\.com/,
+          instagram: /instagram\.com/,
+          youtube: /youtube\.com/,
+          github: /github\.com/,
+          tiktok: /tiktok\.com/
+        }
+
+        # Check links
+        links.each do |link|
+          platforms.each do |platform, pattern|
+            socials[platform] ||= link if link.match?(pattern)
+          end
+        end
+
+        socials
+      end
+    end
+
+    # Get robots.txt URL
+    # @return [String] robots.txt URL
+    def robots_txt_url
+      "#{@url.split('/')[0..2].join('/')}/robots.txt" if @url
+    end
+
+    # Get sitemap URL
+    # @return [Array<String>] Array of sitemap URLs
+    def sitemap_url
+      @sitemap_url ||= begin
+        sitemaps = []
+
+        # Check for sitemap link tag
+        @page.css('link[rel="sitemap"]').each do |link|
+          href = link[:href]
+          sitemaps << make_absolute_url(href) if href
+        end
+
+        # Add default sitemap.xml
+        sitemaps << "#{@url.split('/')[0..2].join('/')}/sitemap.xml" if @url
+
+        sitemaps.uniq.compact
+      end
+    end
+
+    # Detect CMS and get detailed information
+    # @return [Hash] CMS information
+    def cms_info
+      @cms_info ||= begin
+        info = { name: nil, version: nil, themes: [], plugins: [] }
+
+        # WordPress detection
+        if @page.to_html.include?('wp-content') || @meta['generator']&.include?('WordPress')
+          info[:name] = 'WordPress'
+          # Try to extract version from generator meta tag
+          info[:version] = Regexp.last_match(1) if @meta['generator'] =~ /WordPress\s+([\d.]+)/
+
+          # Detect themes
+          @page.css('link[href*="wp-content/themes"]').each do |link|
+            info[:themes] << Regexp.last_match(1) if link[:href] =~ %r{themes/([^/]+)}
+          end
+
+          # Detect plugins
+          @page.css('link[href*="wp-content/plugins"], script[src*="wp-content/plugins"]').each do |elem|
+            src = elem[:href] || elem[:src]
+            info[:plugins] << Regexp.last_match(1) if src =~ %r{plugins/([^/]+)}
+          end
+        # Drupal detection
+        elsif @page.to_html.include?('Drupal') || @meta['generator']&.include?('Drupal')
+          info[:name] = 'Drupal'
+          info[:version] = Regexp.last_match(1) if @meta['generator'] =~ /Drupal\s+([\d.]+)/
+        # Joomla detection
+        elsif @meta['generator']&.include?('Joomla')
+          info[:name] = 'Joomla'
+          info[:version] = Regexp.last_match(1) if @meta['generator'] =~ /Joomla!\s+([\d.]+)/
+        # Shopify detection
+        elsif @page.to_html.include?('cdn.shopify.com') || @page.to_html.include?('Shopify')
+          info[:name] = 'Shopify'
+        # Wix detection
+        elsif @page.to_html.include?('wix.com') || @page.to_html.include?('_wix')
+          info[:name] = 'Wix'
+        # Squarespace detection
+        elsif @page.to_html.include?('squarespace')
+          info[:name] = 'Squarespace'
+        end
+
+        info[:themes].uniq!
+        info[:plugins].uniq!
+        info
+      end
+    end
+
+    # Calculate a basic accessibility score
+    # @return [Hash] Accessibility score and details
+    def accessibility_score
+      @accessibility_score ||= begin
+        score = 100
+        details = []
+
+        # Check images for alt text
+        images_without_alt = @page.css('img:not([alt])').count
+        total_images = @page.css('img').count
+
+        if total_images.positive?
+          alt_percentage = ((total_images - images_without_alt).to_f / total_images * 100).round
+          if alt_percentage < 100
+            penalty = (100 - alt_percentage) / 4 # Max 25 points penalty
+            score -= penalty
+            details << "#{images_without_alt} images missing alt text"
+          end
+        end
+
+        # Check heading hierarchy
+        h1_count = @page.css('h1').count
+        if h1_count.zero?
+          score -= 15
+          details << 'No H1 heading found'
+        elsif h1_count > 1
+          score -= 10
+          details << 'Multiple H1 headings found'
+        end
+
+        # Check for ARIA labels on interactive elements
+        buttons_without_aria = @page.css('button:not([aria-label]):not([aria-labelledby])').select do |btn|
+          btn.text.strip.empty?
+        end.count
+
+        if buttons_without_aria.positive?
+          score -= [buttons_without_aria * 5, 20].min
+          details << "#{buttons_without_aria} buttons without accessible labels"
+        end
+
+        # Check for language attribute
+        html_tag = @page.at('html')
+        if html_tag.nil? || html_tag['lang'].nil? || html_tag['lang'].empty?
+          score -= 10
+          details << 'No language attribute on HTML element'
+        end
+
+        # Check for form labels
+        inputs = @page.css('input[type="text"], input[type="email"], input[type="password"], textarea')
+        inputs_without_labels = inputs.select do |input|
+          id = input['id']
+          !id || @page.css("label[for=\"#{id}\"]").empty?
+        end.count
+
+        if inputs_without_labels.positive?
+          score -= [inputs_without_labels * 5, 15].min
+          details << "#{inputs_without_labels} form inputs without labels"
+        end
+
+        { score: [score, 0].max, details: details }
+      end
+    end
+
+    # Check if the page is mobile-friendly
+    # @return [Boolean] true if mobile-friendly
+    def mobile_friendly?
+      @mobile_friendly ||= begin
+        # Check for viewport meta tag
+        viewport = @meta['viewport']
+        has_viewport = !viewport.nil? && viewport.include?('width=device-width')
+
+        # Check for responsive CSS (media queries)
+        has_media_queries = stylesheets.any? || @page.to_html.include?('@media')
+
+        has_viewport && has_media_queries
+      end
+    end
+
     private
 
     # Count occurrences of words in text

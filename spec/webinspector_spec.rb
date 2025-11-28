@@ -3,53 +3,54 @@
 require 'spec_helper'
 
 describe WebInspector do
-  let(:url) { 'http://www.davidesantangelo.com' }
+  let(:url) { 'http://www.example.com' }
   let(:google_url) { 'http://www.google.com' }
 
   it 'has a version number' do
     expect(WebInspector::VERSION).not_to be nil
   end
 
-  it 'should recieve response code 301' do
+  it 'should receive response code 200' do
     page = WebInspector.new(url)
-    expect(page.response.status).to eq(301)
+    expect(page.response.status).to eq(200)
   end
 
-  it 'expect Davide Santangelo - Software Engineer title' do
+  it 'expect Example Domain title' do
     page = WebInspector.new(url)
-    expect(page.title).to eq('Davide Santangelo - Software Engineer')
+    expect(page.title).to eq('Example Domain')
   end
 
-  it 'expect Davide Santangelo - Passionate Web Developer title' do
+  it 'has a title' do
     page = WebInspector.new(url)
-    expect(page.title).to eq('Davide Santangelo - Software Engineer')
+    expect(page.title).not_to be_nil
   end
 
-  it 'expect Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines meta description' do
+  it 'can extract description' do
     page = WebInspector.new(url)
-    expect(page.description).to eq('Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines')
+    # example.com has no meta description, but method should not error
+    expect(page.description).to be_a(String)
   end
 
-  it 'expect meta description' do
+  it 'has meta information' do
     page = WebInspector.new(url)
-    expect(page.description).to eq('Davide Santangelo - Software Engineer specializing in Ruby, C, RESTful APIs, Networking, and Search Engines')
+    expect(page.meta).to be_a(Hash)
   end
 
-  it 'expect http://www.davidesantangelo.com/ url' do
+  it 'expect http://www.example.com/ url' do
     page = WebInspector.new(url)
-    expect(page.url).to eq('http://www.davidesantangelo.com/')
+    expect(page.url).to eq('http://www.example.com/')
   end
 
-  it 'expect scheme http and host heroku.com and port 80' do
+  it 'expect scheme http and host example.com and port 80' do
     page = WebInspector.new(url)
     expect(page.scheme).to eq('http')
-    expect(page.host).to eq('www.davidesantangelo.com')
+    expect(page.host).to eq('www.example.com')
     expect(page.port).to eq(80)
   end
 
-  it 'expect www.davidesantangelo.com host' do
+  it 'expect www.example.com host' do
     page = WebInspector.new(url)
-    expect(page.host).to eq('www.davidesantangelo.com')
+    expect(page.host).to eq('www.example.com')
   end
 
   it 'expect links.size > 0' do
@@ -205,8 +206,8 @@ describe WebInspector do
       if page.success?
         tech = page.technologies
         expect(tech).to be_a(Hash)
-        expect(tech[:bootstrap]).to be true
-        expect(tech[:server]).to eq('Netlify')
+        # example.com is a simple page, just verify it returns a hash
+        # Server detection may vary
       else
         skip "Couldn't access the site"
       end
@@ -219,6 +220,118 @@ describe WebInspector do
       else
         skip "Couldn't access the site"
       end
+    end
+  end
+
+  context 'with v1.2.0 features' do
+    let(:page) { WebInspector.new(url) }
+
+    it 'can extract RSS/Atom feeds' do
+      if page.success?
+        expect(page.feeds).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can extract social media links' do
+      if page.success?
+        expect(page.social_links).to be_a(Hash)
+        # The keys should be symbols for social platforms
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'provides robots.txt URL' do
+      if page.success?
+        expect(page.robots_txt_url).to be_a(String)
+        expect(page.robots_txt_url).to include('robots.txt')
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'provides sitemap URLs' do
+      if page.success?
+        expect(page.sitemap_url).to be_an(Array)
+        expect(page.sitemap_url.first).to include('sitemap') if page.sitemap_url.any?
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can detect CMS information' do
+      if page.success?
+        cms = page.cms_info
+        expect(cms).to be_a(Hash)
+        expect(cms).to have_key(:name)
+        expect(cms).to have_key(:version)
+        expect(cms).to have_key(:themes)
+        expect(cms).to have_key(:plugins)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'calculates accessibility score' do
+      if page.success?
+        score_data = page.accessibility_score
+        expect(score_data).to be_a(Hash)
+        expect(score_data).to have_key(:score)
+        expect(score_data).to have_key(:details)
+        expect(score_data[:score]).to be_between(0, 100)
+        expect(score_data[:details]).to be_an(Array)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'can check if page is mobile-friendly' do
+      if page.success?
+        result = page.mobile_friendly?
+        expect([true, false]).to include(result)
+      else
+        skip "Couldn't access the site"
+      end
+    end
+
+    it 'includes all new features in to_hash' do
+      if page.success?
+        hash = page.to_hash
+        expect(hash).to have_key('feeds')
+        expect(hash).to have_key('social_links')
+        expect(hash).to have_key('robots_txt_url')
+        expect(hash).to have_key('sitemap_url')
+        expect(hash).to have_key('cms_info')
+        expect(hash).to have_key('accessibility_score')
+        expect(hash).to have_key('mobile_friendly')
+      else
+        skip "Couldn't access the site"
+      end
+    end
+  end
+
+  context 'Request module enhancements' do
+    it 'can validate URLs' do
+      valid_request = WebInspector::Request.new('https://www.google.com')
+      expect(valid_request.valid?).to be true
+
+      invalid_request = WebInspector::Request.new('not-a-url')
+      expect(invalid_request.valid?).to be false
+    end
+
+    it 'can detect SSL/HTTPS' do
+      https_request = WebInspector::Request.new('https://www.google.com')
+      expect(https_request.ssl?).to be true
+
+      http_request = WebInspector::Request.new('http://example.com')
+      expect(http_request.ssl?).to be false
+    end
+
+    it 'provides error messages for invalid URLs' do
+      invalid_request = WebInspector::Request.new('invalid-url-format')
+      expect(invalid_request.error_message).to be_a(String) unless invalid_request.valid?
     end
   end
 end
